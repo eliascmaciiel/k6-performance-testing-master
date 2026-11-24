@@ -4,7 +4,7 @@ import http from 'k6/http';
 import { check } from 'k6';
 import { Trend, Rate } from 'k6/metrics';
 
-export const getContactsDuration = new Trend('get_contacts', true);
+export const getQuickPizzaDuration = new Trend('get_quickpizza', true);
 export const RateContentOK = new Rate('content_OK');
 
 export const options = {
@@ -12,7 +12,7 @@ export const options = {
   thresholds: {
     http_req_failed: ['rate<0.25'],
     http_req_duration: ['p(90)<6800'],
-    get_contacts: ['p(99)<500'],
+    get_quickpizza: ['p(99)<500'],
     content_OK: ['rate>0.95']
   },
   stages: [
@@ -29,7 +29,7 @@ export function handleSummary(data) {
 }
 
 export default function () {
-  const baseUrl = 'https://test.k6.io/';
+  const baseUrl = 'https://quickpizza.grafana.com/api/get';
 
   const params = {
     headers: {
@@ -41,11 +41,11 @@ export default function () {
 
   const res = http.get(`${baseUrl}`, params);
 
-  getContactsDuration.add(res.timings.duration);
+  getQuickPizzaDuration.add(res.timings.duration);
 
   RateContentOK.add(res.status === OK);
 
   check(res, {
-    'GET Contacts - Status 200': () => res.status === OK
+    'GET QuickPizza API - Status 200': () => res.status === OK
   });
 }
